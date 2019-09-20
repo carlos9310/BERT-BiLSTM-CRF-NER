@@ -9,6 +9,7 @@
 
 import argparse
 import os
+import ast
 
 __all__ = ['get_args_parser']
 
@@ -66,11 +67,11 @@ def get_args_parser():
                         help='save_checkpoints_steps')
     group2.add_argument('-save_summary_steps', type=int, default=500,
                         help='save_summary_steps.')
-    group2.add_argument('-filter_adam_var', type=bool, default=False,
+    group2.add_argument('-filter_adam_var', type=ast.literal_eval, default=False,
                         help='after training do filter Adam params from model and save no Adam params model in file.')
-    group2.add_argument('-do_lower_case', type=bool, default=True,
+    group2.add_argument('-do_lower_case', type=ast.literal_eval, default=True,
                         help='Whether to lower case the input text.')
-    group2.add_argument('-clean', type=bool, default=True)
+    group2.add_argument('-clean', type=ast.literal_eval, default=True)
     group2.add_argument('-device_map', type=str, default='0',
                         help='witch device using to train')
 
