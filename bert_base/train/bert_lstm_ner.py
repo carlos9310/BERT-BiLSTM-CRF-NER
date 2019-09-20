@@ -145,7 +145,7 @@ class NerProcessor(DataProcessor):
             for line in f:
                 contends = line.strip()
                 tokens = contends.split(' ')
-                if len(tokens) == 2:
+                if len(tokens) == 2 or len(tokens) == 4:
                     words.append(tokens[0])
                     labels.append(tokens[-1])
                 else:
