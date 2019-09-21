@@ -105,8 +105,8 @@ class BLSTM_CRF(object):
     def project_bilstm_layer(self, lstm_outputs, name=None):
         """
         hidden layer between lstm layer and logits
-        :param lstm_outputs: [batch_size, num_steps, emb_size]
-        :return: [batch_size, num_steps, num_tags]
+        :param lstm_outputs: [batch_size, max_seq_len, 2*units]
+        :return: [batch_size, max_seq_len, num_tags]
         """
         with tf.variable_scope("project" if not name else name):
             with tf.variable_scope("hidden"):
@@ -132,8 +132,8 @@ class BLSTM_CRF(object):
     def project_crf_layer(self, embedding_chars, name=None):
         """
         hidden layer between input layer and logits
-        :param lstm_outputs: [batch_size, num_steps, emb_size]
-        :return: [batch_size, num_steps, num_tags]
+        :param lstm_outputs: [batch_size, max_seq_len, emb_size]
+        :return: [batch_size, max_seq_len, num_tags]
         """
         with tf.variable_scope("project" if not name else name):
             with tf.variable_scope("logits"):
@@ -142,8 +142,8 @@ class BLSTM_CRF(object):
 
                 b = tf.get_variable("b", shape=[self.num_labels], dtype=tf.float32,
                                     initializer=tf.zeros_initializer())
-                output = tf.reshape(self.embedded_chars,
-                                    shape=[-1, self.embedding_dims])  # [batch_size, embedding_dims]
+                output = tf.reshape(embedding_chars,
+                                    shape=[-1, self.embedding_dims])  # [batch_size*seq_len, embedding_dims]
                 pred = tf.tanh(tf.nn.xw_plus_b(output, W, b))
             return tf.reshape(pred, [-1, self.seq_length, self.num_labels])
 
@@ -162,8 +162,8 @@ class BLSTM_CRF(object):
                 return None, trans
             else:
                 log_likelihood, trans = tf.contrib.crf.crf_log_likelihood(
-                    inputs=logits,
-                    tag_indices=self.labels,
-                    transition_params=trans,
-                    sequence_lengths=self.lengths)
+                    inputs=logits,  # [batch_size,seq_len,num_labels]
+                    tag_indices=self.labels,  # [batch_size,seq_len]
+                    transition_params=trans,  # [self.num_labels, self.num_labels]
+                    sequence_lengths=self.lengths)  # [len(s1),len(s2),...,len(sb)]
                 return tf.reduce_mean(-log_likelihood), trans

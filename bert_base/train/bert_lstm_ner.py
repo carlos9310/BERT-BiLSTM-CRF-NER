@@ -376,7 +376,7 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
         segment_ids = features["segment_ids"]
         label_ids = features["label_ids"]
 
-        print('shape of input_ids', input_ids.shape)
+        # print('shape of input_ids', input_ids.shape)
         # label_mask = features["label_mask"]
         is_training = (mode == tf.estimator.ModeKeys.TRAIN)
 
